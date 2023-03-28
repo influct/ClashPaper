@@ -5,10 +5,10 @@ Subject: [PATCH] Dont close Slime Plugin Classloader
 
 
 diff --git a/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java b/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
-index 6fb179c4d420eac3a6399fbff104b5af6ba448ba..b4102a81854b844d8e1ea257223feec03e989382 100644
+index fe21d31b463317eb90d58cbca5f098958ca93938..8ae0addea5a00938eb04169117ccfb6cecae2d75 100644
 --- a/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
 +++ b/src/main/java/org/bukkit/plugin/java/PluginClassLoader.java
-@@ -244,7 +244,9 @@ public final class PluginClassLoader extends URLClassLoader { // Spigot
+@@ -256,7 +256,9 @@ public final class PluginClassLoader extends URLClassLoader implements io.paperm
              super.close();
          } finally {
              this.closed = true; // Pufferfish
