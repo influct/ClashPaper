@@ -178,7 +178,7 @@ index 0000000000000000000000000000000000000000..3ce7ea15a11abe537edb0aafa8e12e9b
 +}
 diff --git a/src/main/java/com/infernalsuite/aswm/SimpleDataFixerConverter.java b/src/main/java/com/infernalsuite/aswm/SimpleDataFixerConverter.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..58d67fce6b44e763b89aaf58ab725e5ccba0c60e
+index 0000000000000000000000000000000000000000..2f7787178fb41a7e892b1e6ceff371b022f5d423
 --- /dev/null
 +++ b/src/main/java/com/infernalsuite/aswm/SimpleDataFixerConverter.java
 @@ -0,0 +1,102 @@
@@ -220,7 +220,7 @@ index 0000000000000000000000000000000000000000..58d67fce6b44e763b89aaf58ab725e5c
 +            List<CompoundTag> entities = new ArrayList<>();
 +            List<CompoundTag> blockEntities = new ArrayList<>();
 +            for (CompoundTag upgradeEntity : chunk.getTileEntities()) {
-+                entities.add(
++                blockEntities.add(
 +                        convertAndBack(upgradeEntity, (tag) -> MCTypeRegistry.TILE_ENTITY.convert(new NBTMapType(tag), currentVersion, newVersion))
 +                );
 +            }
@@ -1327,7 +1327,7 @@ index 0000000000000000000000000000000000000000..e85fd58bbe4fb53ad6e8fed13df8c1b5
 +}
 diff --git a/src/main/java/com/infernalsuite/aswm/level/SlimeInMemoryWorld.java b/src/main/java/com/infernalsuite/aswm/level/SlimeInMemoryWorld.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..9bc04bc3215c088a799219551b53f13f9ced5212
+index 0000000000000000000000000000000000000000..4c9d24cf08d1c320f54f7bbf6169bd75ae883220
 --- /dev/null
 +++ b/src/main/java/com/infernalsuite/aswm/level/SlimeInMemoryWorld.java
 @@ -0,0 +1,252 @@
@@ -1499,7 +1499,7 @@ index 0000000000000000000000000000000000000000..9bc04bc3215c088a799219551b53f13f
 +            }
 +        }
 +
-+        SlimeWorld cloned = SkeletonCloning.fullClone(worldName, this);
++        SlimeWorld cloned = SkeletonCloning.fullClone(worldName, this, loader);
 +        if (loader != null) {
 +            loader.saveWorld(worldName, SlimeSerializer.serialize(cloned));
 +        }
@@ -1949,10 +1949,9 @@ index f597d65d56964297eeeed6c7e77703764178fee0..3bdad76344fa2e417eb544fad48968ed
      public ChunkHolder.FullChunkStatus status;
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 676aef170c5aa69b20c18a3af0cc0231184b5ee1..55cd1163c06c40b10128fab32342ae3b4ae09e47 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -273,7 +273,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -274,7 +274,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
      private final PackRepository packRepository;
      private final ServerScoreboard scoreboard;
      @Nullable
@@ -1961,7 +1960,7 @@ index 676aef170c5aa69b20c18a3af0cc0231184b5ee1..55cd1163c06c40b10128fab32342ae3b
      private final CustomBossEvents customBossEvents;
      private final ServerFunctionManager functionManager;
      private final FrameTimer frameTimer;
-@@ -465,18 +465,33 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -464,18 +464,33 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              if (dimensionKey == LevelStem.NETHER) {
                  if (this.isNetherEnabled()) {
                      dimension = -1;
@@ -2013,7 +2012,7 @@ index c6f5d6756fa0e068a462d9c0ded12e0771abba37..928620b09db949668b3525fe90ad4375
          this.mainThreadProcessor = new ServerChunkCache.MainThreadExecutor(world);
          this.mainThread = Thread.currentThread();
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index ff2862bf1f511196d1e911e2584262ed728e9a81..4801b55917bd4e105f015fc62d3fba5caed52f2b 100644
+index 3bb63a652aca3c23f5f1bbf9cb70fce6540f2e33..250f187ae77fe9f2f15bd5784027b93152979c3a 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -130,12 +130,10 @@ import net.minecraft.world.level.chunk.storage.EntityStorage;
