@@ -316,7 +316,8 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin, Listener {
         if (!slimeWorld.isReadOnly() && slimeWorld.getLoader() != null) {
             try {
                 slimeWorld.getLoader().acquireLock(slimeWorld.getName());
-            } catch (UnknownWorldException | WorldLockedException | IOException e) {
+            } catch (UnknownWorldException ignored) {
+            } catch (WorldLockedException | IOException e) {
                 e.printStackTrace();
             }
         }
