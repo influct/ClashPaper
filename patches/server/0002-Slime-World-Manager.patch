@@ -1949,6 +1949,7 @@ index f597d65d56964297eeeed6c7e77703764178fee0..3bdad76344fa2e417eb544fad48968ed
      public ChunkHolder.FullChunkStatus status;
  
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 714feb1ab6c14b39d8aefa18f5746b2df7b0b887..a77e790c01944fd73b57768187e01fa7bbd9bb6d 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
 @@ -274,7 +274,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -1960,7 +1961,7 @@ diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/
      private final CustomBossEvents customBossEvents;
      private final ServerFunctionManager functionManager;
      private final FrameTimer frameTimer;
-@@ -464,18 +464,33 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -466,18 +466,33 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
              if (dimensionKey == LevelStem.NETHER) {
                  if (this.isNetherEnabled()) {
                      dimension = -1;
@@ -2012,7 +2013,7 @@ index c6f5d6756fa0e068a462d9c0ded12e0771abba37..928620b09db949668b3525fe90ad4375
          this.mainThreadProcessor = new ServerChunkCache.MainThreadExecutor(world);
          this.mainThread = Thread.currentThread();
 diff --git a/src/main/java/net/minecraft/server/level/ServerLevel.java b/src/main/java/net/minecraft/server/level/ServerLevel.java
-index 3bb63a652aca3c23f5f1bbf9cb70fce6540f2e33..250f187ae77fe9f2f15bd5784027b93152979c3a 100644
+index dda5e77f7d9fb2340d50997c0a17bc7f5e2bb961..70327bbf8f495aec0dc3df4819d6eb4c10a7bc60 100644
 --- a/src/main/java/net/minecraft/server/level/ServerLevel.java
 +++ b/src/main/java/net/minecraft/server/level/ServerLevel.java
 @@ -130,12 +130,10 @@ import net.minecraft.world.level.chunk.storage.EntityStorage;
