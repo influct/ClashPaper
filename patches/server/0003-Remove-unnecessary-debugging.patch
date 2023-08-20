@@ -1,0 +1,33 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: BlackBaroness <shoyurash2@gmail.com>
+Date: Sun, 20 Aug 2023 18:39:40 +0300
+Subject: [PATCH] Remove unnecessary debugging
+
+
+diff --git a/src/main/java/com/infernalsuite/aswm/level/SlimeLevelInstance.java b/src/main/java/com/infernalsuite/aswm/level/SlimeLevelInstance.java
+index 44b540b924f35ca3e535035b3539793c46e7d200..182a2e1ce3a44b00d445ae8b260db6901a30d251 100644
+--- a/src/main/java/com/infernalsuite/aswm/level/SlimeLevelInstance.java
++++ b/src/main/java/com/infernalsuite/aswm/level/SlimeLevelInstance.java
+@@ -143,18 +143,18 @@ public class SlimeLevelInstance extends ServerLevel {
+     private Future<?> save() {
+         synchronized (saveLock) { // Don't want to save the SlimeWorld from multiple threads simultaneously
+             SlimeWorldInstance slimeWorld = this.slimeInstance;
+-            Bukkit.getLogger().log(Level.INFO, "Saving world " + this.slimeInstance.getName() + "...");
++            Bukkit.getLogger().log(Level.FINE, "Saving world " + this.slimeInstance.getName() + "...");
+             long start = System.currentTimeMillis();
+ 
+-            Bukkit.getLogger().log(Level.INFO, "CONVERTING NMS -> SKELETON");
++            Bukkit.getLogger().log(Level.FINE, "CONVERTING NMS -> SKELETON");
+             SlimeWorld world = this.slimeInstance.getForSerialization();
+-            Bukkit.getLogger().log(Level.INFO, "CONVERTED TO SKELETON, PUSHING OFF-THREAD");
++            Bukkit.getLogger().log(Level.FINE, "CONVERTED TO SKELETON, PUSHING OFF-THREAD");
+             return WORLD_SAVER_SERVICE.submit(() -> {
+                 try {
+                     byte[] serializedWorld = SlimeSerializer.serialize(world);
+                     long saveStart = System.currentTimeMillis();
+                     slimeWorld.getSaveStrategy().saveWorld(slimeWorld.getName(), serializedWorld);
+-                    Bukkit.getLogger().log(Level.INFO, "World " + slimeWorld.getName() + " serialized in " + (saveStart - start) + "ms and saved in " + (System.currentTimeMillis() - saveStart) + "ms.");
++                    Bukkit.getLogger().log(Level.FINE, "World " + slimeWorld.getName() + " serialized in " + (saveStart - start) + "ms and saved in " + (System.currentTimeMillis() - saveStart) + "ms.");
+                 } catch (IOException | IllegalStateException ex) {
+                     ex.printStackTrace();
+                 }
