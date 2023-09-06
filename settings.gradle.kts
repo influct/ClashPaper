@@ -5,7 +5,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "slimeworldmanager"
+rootProject.name = "clashpaper"
 
 include("plugin", "core", "api", "importer")
 include("slimeworldmanager-api", "slimeworldmanager-server")
