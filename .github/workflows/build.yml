@@ -44,7 +44,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Paperclip
-          path: build/libs/slimeworldmanager-paperclip-*.jar
+          path: build/libs/clashpaper-paperclip-*.jar
       - name: Upload Plugin
         uses: actions/upload-artifact@v3
         with:
