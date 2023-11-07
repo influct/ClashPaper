@@ -1,0 +1,94 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Emmanuel Lampe <mail@emmanuel-lampe.de>
+Date: Tue, 7 Nov 2023 12:35:30 +0100
+Subject: [PATCH] fix: clear chunk storage for slime world after unload
+
+
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index a77e790c01944fd73b57768187e01fa7bbd9bb6d..b097fbb692f18c96c930b707d8204fd1aa035b79 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1699,7 +1699,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+ 
+     @DontObfuscate
+     public String getServerModName() {
+-        return "SlimeWorldManager"; // ASWM // Pufferfish - Pufferfish > // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
++        return "ClashPaper"; // ASWM // Pufferfish - Pufferfish > // Paper - Paper > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
+     }
+ 
+     public SystemReport fillSystemReport(SystemReport details) {
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index e25394c015d79068091bf1515dcadcff699919f6..0388ccbfce317e026be7e0ac41245fd3bf304d84 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -257,7 +257,7 @@ import javax.annotation.Nullable; // Paper
+ import javax.annotation.Nonnull; // Paper
+ 
+ public final class CraftServer implements Server {
+-    private final String serverName = "SlimeWorldManager"; // Paper // Pufferfish // SWM
++    private final String serverName = "ClashPaper"; // Paper // Pufferfish // SWM
+     private final String serverVersion;
+     private final String bukkitVersion = Versioning.getBukkitVersion();
+     private final Logger logger = Logger.getLogger("Minecraft");
+@@ -1280,18 +1280,22 @@ public final class CraftServer implements Server {
+         if (world == null) {
+             return false;
+         }
++        logger.info("Unloading world " + world.getName());
+ 
+         ServerLevel handle = ((CraftWorld) world).getHandle();
+ 
+         if (this.console.getLevel(handle.dimension()) == null) {
++            logger.info("Attempted to unload " + world.getName() + " but the world already appears unloaded");
+             return false;
+         }
+ 
+         if (handle.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
++            logger.info("Attempted to unload " + world.getName() + " but the world appears to be the main world");
+             return false;
+         }
+ 
+         if (handle.players().size() > 0) {
++            logger.info("Attempted to unload " + world.getName() + " but there are still " + handle.players().size() + " players in that world!");
+             return false;
+         }
+ 
+@@ -1299,6 +1303,7 @@ public final class CraftServer implements Server {
+         this.pluginManager.callEvent(e);
+ 
+         if (e.isCancelled()) {
++            logger.info("Cancelled unloading of " + world.getName());
+             return false;
+         }
+ 
+@@ -1310,12 +1315,17 @@ public final class CraftServer implements Server {
+             handle.getChunkSource().close(save);
+             // handle.entityManager.close(save); // SPIGOT-6722: close entityManager // Paper - rewrite chunk system
+             handle.convertable.close();
++            // Check if the world is a slime world instance
++            if(handle.getChunkSource().bootstrap != null) {
++                handle.getChunkSource().bootstrap.initial().getChunkStorage().clear(); // ASWM - clear chunk storage
++            }
+         } catch (Exception ex) {
+             this.getLogger().log(Level.SEVERE, null, ex);
+         }
+ 
+         this.worlds.remove(world.getName().toLowerCase(java.util.Locale.ENGLISH));
+         this.console.removeLevel(handle);
++        logger.info("World Unloaded");
+         return true;
+     }
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+index 55b57d7bedf5919f4075885e3bb77c26334081ef..2cf028ee6f11b4155778ac58a64dafb2fabc07a0 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/Versioning.java
+@@ -11,7 +11,7 @@ public final class Versioning {
+     public static String getBukkitVersion() {
+         String result = "Unknown-Version";
+ 
+-        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.infernalsuite.aswm/slimeworldmanager-api/pom.properties"); // Pufferfish // ASWM
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/eu.miopowered.aswm/slimeworldmanager-api/pom.properties"); // Pufferfish // ASWM
+         Properties properties = new Properties();
+ 
+         if (stream != null) {
